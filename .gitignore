@@ -1,0 +1,29 @@
+# KiCad backup / autosave / lock files
+*-backups/
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.kicad_prl
+_autosave-*
+*.lck
+*.bak
+*.000
+*.dsn
+*.ses
+
+# Output / fabrication artifacts
+gerbers/
+fab/
+*.zip
+*.drl
+*.gbr
+*.gbl
+*.gtl
+*.gbs
+*.gts
+*.gbo
+*.gto
+*.gko
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,15 @@
+(kicad_sch (version 20231120) (generator "eeschema")
+  (uuid "11111111-2222-3333-4444-555555555555")
+  (paper "A3")
+  (title_block
+    (title "NCV7240 x4 Low-side Driver Board")
+    (date "2026-05-12")
+    (rev "0.1")
+    (company "")
+    (comment 1 "ESP32-S3 + AP33772S USB-C PD EPR @ 24V driving 32 channels via 4x NCV7240")
+  )
+  (lib_symbols)
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+)
