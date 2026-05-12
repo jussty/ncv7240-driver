@@ -29,3 +29,6 @@ fab/
 Thumbs.db
 drc.rpt
 *.rpt
+tools/freerouting/*.jar
+freerouting.log
+freerouting.json
