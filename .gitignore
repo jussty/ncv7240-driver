@@ -27,3 +27,5 @@ fab/
 # OS
 .DS_Store
 Thumbs.db
+drc.rpt
+*.rpt

@@ -97,257 +97,133 @@ def track(x1, y1, x2, y2, net, layer="F.Cu", width=0.25):
 
 # ---------- footprint factories (placed at component's local origin) -------
 
-def place_r0603(ref, value, x, y, rot, n1, n2):
-    # Pads at ±0.825 mm, 0.8×0.95 mm
-    out = fp_open("Resistor_SMD:R_0603_1608Metric", ref, value, x, y, rot)
-    px, py = 0.825, 0
-    # Apply rotation to pad positions
-    if rot == 90 or rot == 270:
-        px, py = 0, 0.825
-    out.append(pad_smd("1", x - px, y - py, 0.8, 0.95, n1))
-    out.append(pad_smd("2", x + px, y + py, 0.8, 0.95, n2))
+def _two_pad(lib, ref, value, x, y, rot, px, pw, ph, n1, n2):
+    """Generic 2-pad SMD footprint. Pads at LOCAL (±px, 0); KiCad rotates."""
+    out = fp_open(lib, ref, value, x, y, rot)
+    out.append(pad_smd("1", -px, 0, pw, ph, n1))
+    out.append(pad_smd("2", +px, 0, pw, ph, n2))
     out.extend(fp_close()); emit("\n".join(out))
+
+def place_r0603(ref, value, x, y, rot, n1, n2):
+    _two_pad("Resistor_SMD:R_0603_1608Metric", ref, value, x, y, rot, 0.825, 0.8, 0.95, n1, n2)
 
 def place_c0603(ref, value, x, y, rot, n1, n2):
-    out = fp_open("Capacitor_SMD:C_0603_1608Metric", ref, value, x, y, rot)
-    px, py = 0.875, 0
-    if rot in (90, 270): px, py = 0, 0.875
-    out.append(pad_smd("1", x - px, y - py, 0.9, 0.95, n1))
-    out.append(pad_smd("2", x + px, y + py, 0.9, 0.95, n2))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Capacitor_SMD:C_0603_1608Metric", ref, value, x, y, rot, 0.875, 0.9, 0.95, n1, n2)
 
 def place_c0805(ref, value, x, y, rot, n1, n2):
-    out = fp_open("Capacitor_SMD:C_0805_2012Metric", ref, value, x, y, rot)
-    px, py = 0.95, 0
-    if rot in (90, 270): px, py = 0, 0.95
-    out.append(pad_smd("1", x - px, y - py, 1.025, 1.4, n1))
-    out.append(pad_smd("2", x + px, y + py, 1.025, 1.4, n2))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Capacitor_SMD:C_0805_2012Metric", ref, value, x, y, rot, 0.95, 1.025, 1.4, n1, n2)
 
 def place_c1210(ref, value, x, y, rot, n1, n2):
-    out = fp_open("Capacitor_SMD:C_1210_3225Metric", ref, value, x, y, rot)
-    px, py = 1.475, 0
-    if rot in (90, 270): px, py = 0, 1.475
-    out.append(pad_smd("1", x - px, y - py, 1.6, 2.7, n1))
-    out.append(pad_smd("2", x + px, y + py, 1.6, 2.7, n2))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Capacitor_SMD:C_1210_3225Metric", ref, value, x, y, rot, 1.475, 1.6, 2.7, n1, n2)
 
 def place_cp_elec(ref, value, x, y, rot, n_pos, n_neg):
-    # 10×10.5 mm aluminium polymer SMD; pads ±3.4 mm @ 4.3×2.6
-    out = fp_open("Capacitor_SMD:CP_Elec_10x10.5", ref, value, x, y, rot)
-    px, py = 3.4, 0
-    if rot in (90, 270): px, py = 0, 3.4
-    out.append(pad_smd("1", x - px, y - py, 4.3, 2.6, n_pos))
-    out.append(pad_smd("2", x + px, y + py, 4.3, 2.6, n_neg))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Capacitor_SMD:CP_Elec_10x10.5", ref, value, x, y, rot, 3.4, 4.3, 2.6, n_pos, n_neg)
 
 def place_inductor(ref, value, x, y, rot, n1, n2):
-    # Bourns SRN6045 — 6.5×6.0 mm, pads ±2.4 mm @ 2.3×3.0
-    out = fp_open("Inductor_SMD:L_Bourns-SRN6045TA", ref, value, x, y, rot)
-    px, py = 2.4, 0
-    if rot in (90, 270): px, py = 0, 2.4
-    out.append(pad_smd("1", x - px, y - py, 2.3, 3.0, n1))
-    out.append(pad_smd("2", x + px, y + py, 2.3, 3.0, n2))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Inductor_SMD:L_Bourns-SRN6045TA", ref, value, x, y, rot, 2.4, 2.3, 3.0, n1, n2)
 
 def place_dsma(ref, value, x, y, rot, n_k, n_a):
-    # SMA: pads ±1.925 mm, 1.65×1.65 mm; pin 1 = K (left in rot=0)
-    out = fp_open("Diode_SMD:D_SMA", ref, value, x, y, rot)
-    px, py = 1.925, 0
-    if rot in (90, 270): px, py = 0, 1.925
-    out.append(pad_smd("1", x - px, y - py, 1.65, 1.65, n_k))
-    out.append(pad_smd("2", x + px, y + py, 1.65, 1.65, n_a))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Diode_SMD:D_SMA", ref, value, x, y, rot, 1.925, 1.65, 1.65, n_k, n_a)
 
 def place_dsmb(ref, value, x, y, rot, n_k, n_a):
-    out = fp_open("Diode_SMD:D_SMB", ref, value, x, y, rot)
-    px, py = 2.2, 0
-    if rot in (90, 270): px, py = 0, 2.2
-    out.append(pad_smd("1", x - px, y - py, 1.95, 2.2, n_k))
-    out.append(pad_smd("2", x + px, y + py, 1.95, 2.2, n_a))
-    out.extend(fp_close()); emit("\n".join(out))
+    _two_pad("Diode_SMD:D_SMB", ref, value, x, y, rot, 2.2, 1.95, 2.2, n_k, n_a)
 
 def place_sot23_6(ref, value, x, y, rot, pin_nets):
-    """SOT-23-6: pads in 2 rows of 3, pitch 0.95 horizontal, 2.8 vertical."""
+    """SOT-23-6 — pads local; footprint rotation handles orientation."""
     out = fp_open("Package_TO_SOT_SMD:SOT-23-6", ref, value, x, y, rot)
-    # pad positions in component frame (rot=0): row at ±1.4 y, three columns at -0.95,0,0.95 x
     pos = [(-0.95,-1.4),(0,-1.4),(0.95,-1.4),(0.95,1.4),(0,1.4),(-0.95,1.4)]
     for i,(dx,dy) in enumerate(pos):
-        if rot == 90:  dx,dy = -dy, dx
-        if rot == 180: dx,dy = -dx,-dy
-        if rot == 270: dx,dy =  dy,-dx
-        out.append(pad_smd(str(i+1), x+dx, y+dy, 0.6, 1.0, pin_nets[i]))
+        out.append(pad_smd(str(i+1), dx, dy, 0.6, 1.0, pin_nets[i]))
     out.extend(fp_close()); emit("\n".join(out))
 
 def place_qfn24_4mm(ref, value, x, y, rot, pin_nets, ep_net="GND"):
-    """QFN-24 4×4 mm P0.5; AP33772S pinout."""
+    """QFN-24 4×4 mm P0.5; pads in LOCAL coords (no pre-rotation)."""
     out = fp_open("Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm",
                   ref, value, x, y, rot)
     P = 0.5
-    side_offset = 2.05  # pad center distance from IC center, perimeter pads
-    # Pin numbering: pin 1 at top-left, counter-clockwise (KiCad convention)
-    # 6 pads per side, side 1 left (1-6), side 2 bottom (7-12), side 3 right (13-18), side 4 top (19-24)
-    def rotxy(dx,dy):
-        if rot == 0:   return dx,dy
-        if rot == 90:  return -dy,dx
-        if rot == 180: return -dx,-dy
-        if rot == 270: return dy,-dx
-        return dx,dy
+    side_offset = 2.05
     pin = 1
-    # left side (top to bottom)
-    for k in range(6):
-        dx, dy = -side_offset, -1.25 + k*P
-        rdx,rdy = rotxy(dx,dy)
-        out.append(pad_smd(str(pin), x+rdx, y+rdy, 0.85, 0.25, pin_nets[pin-1]))
+    for k in range(6):  # left (top to bottom)
+        out.append(pad_smd(str(pin), -side_offset, -1.25 + k*P, 0.85, 0.25, pin_nets[pin-1]))
         pin += 1
-    # bottom (left to right)
-    for k in range(6):
-        dx, dy = -1.25 + k*P, side_offset
-        rdx,rdy = rotxy(dx,dy)
-        out.append(pad_smd(str(pin), x+rdx, y+rdy, 0.25, 0.85, pin_nets[pin-1]))
+    for k in range(6):  # bottom
+        out.append(pad_smd(str(pin), -1.25 + k*P, side_offset, 0.25, 0.85, pin_nets[pin-1]))
         pin += 1
-    # right (bottom to top)
-    for k in range(6):
-        dx, dy = side_offset, 1.25 - k*P
-        rdx,rdy = rotxy(dx,dy)
-        out.append(pad_smd(str(pin), x+rdx, y+rdy, 0.85, 0.25, pin_nets[pin-1]))
+    for k in range(6):  # right (bottom to top)
+        out.append(pad_smd(str(pin), side_offset, 1.25 - k*P, 0.85, 0.25, pin_nets[pin-1]))
         pin += 1
-    # top (right to left)
-    for k in range(6):
-        dx, dy = 1.25 - k*P, -side_offset
-        rdx,rdy = rotxy(dx,dy)
-        out.append(pad_smd(str(pin), x+rdx, y+rdy, 0.25, 0.85, pin_nets[pin-1]))
+    for k in range(6):  # top (right to left)
+        out.append(pad_smd(str(pin), 1.25 - k*P, -side_offset, 0.25, 0.85, pin_nets[pin-1]))
         pin += 1
-    # exposed pad (EP) 2.6x2.6
-    out.append(pad_smd("25", x, y, 2.6, 2.6, ep_net))
+    out.append(pad_smd("25", 0, 0, 2.6, 2.6, ep_net))  # exposed pad
     out.extend(fp_close()); emit("\n".join(out))
 
 def place_ssop24(ref, value, x, y, rot, pin_nets):
-    """SSOP-24 5.3×8.2 mm, P0.65; NCV7240 pinout."""
-    out = fp_open("Package_SO:SSOP-24_5.3x8.2mm_P0.65mm",
-                  ref, value, x, y, rot)
+    """SSOP-24 5.3×8.2 mm, P0.65; LOCAL pad coords."""
+    out = fp_open("Package_SO:SSOP-24_5.3x8.2mm_P0.65mm", ref, value, x, y, rot)
     P = 0.65
     side_offset = 3.0
-    def rotxy(dx,dy):
-        if rot == 0:   return dx,dy
-        if rot == 90:  return -dy,dx
-        if rot == 180: return -dx,-dy
-        if rot == 270: return dy,-dx
-        return dx,dy
-    # pins 1..12 on left (top to bottom)
-    for k in range(12):
-        dx, dy = -side_offset, -P*5.5 + k*P
-        rdx,rdy = rotxy(dx,dy)
-        out.append(pad_smd(str(k+1), x+rdx, y+rdy, 1.5, 0.4, pin_nets[k]))
-    # pins 13..24 on right (bottom to top)
-    for k in range(12):
-        dx, dy = side_offset, P*5.5 - k*P
-        rdx,rdy = rotxy(dx,dy)
-        out.append(pad_smd(str(k+13), x+rdx, y+rdy, 1.5, 0.4, pin_nets[12+k]))
+    for k in range(12):  # 1..12 left
+        out.append(pad_smd(str(k+1),  -side_offset, -P*5.5 + k*P, 1.5, 0.4, pin_nets[k]))
+    for k in range(12):  # 13..24 right
+        out.append(pad_smd(str(k+13),  side_offset, P*5.5 - k*P, 1.5, 0.4, pin_nets[12+k]))
     out.extend(fp_close()); emit("\n".join(out))
 
 def place_esp32_module(ref, value, x, y, rot, pin_nets):
-    """ESP32-S3-WROOM-1: 18 × 25.5 mm, 41 pads.
-    Simplified — pads 1.5×0.9 mm on perimeter at 0.85 mm pitch.
-    pin_nets = dict pin_number -> net_name (only pins we use are routed).
-    """
+    """ESP32-S3-WROOM-1 simplified — LOCAL pad coords."""
     out = fp_open("RF_Module:ESP32-S3-WROOM-1", ref, value, x, y, rot)
-    # Module is 18 (W) × 25.5 (H). Pads on three sides:
-    #  - bottom edge: 18 pads at y=+12.75, x from -8.5 to +8.5 (P=1.0 approx)
-    #  - left edge:    9 pads
-    #  - right edge:   9 pads
-    # For simplicity emit a regular grid.
-    def rotxy(dx,dy):
-        if rot == 90: return -dy,dx
-        if rot == 180: return -dx,-dy
-        if rot == 270: return dy,-dx
-        return dx,dy
-    # Pins 1..16 on left side (top to bottom)
-    for k in range(16):
-        dx, dy = -9.5, -10.4 + k*1.27
-        rdx,rdy = rotxy(dx,dy)
+    for k in range(16):  # 1..16 left side
         net = pin_nets.get(k+1, "")
         if net:
-            out.append(pad_smd(str(k+1), x+rdx, y+rdy, 1.5, 0.9, net))
-    # Pins 17..32 on right side (top to bottom)
-    for k in range(16):
-        dx, dy = 9.5, -10.4 + k*1.27
-        rdx,rdy = rotxy(dx,dy)
+            out.append(pad_smd(str(k+1), -9.5, -10.4 + k*1.27, 1.5, 0.9, net))
+    for k in range(16):  # 17..32 right side
         net = pin_nets.get(k+17, "")
         if net:
-            out.append(pad_smd(str(k+17), x+rdx, y+rdy, 1.5, 0.9, net))
-    # Pins 33..41 on bottom (left to right) — including GND pad
-    for k in range(9):
-        dx, dy = -8.0 + k*2.0, 11.5
-        rdx,rdy = rotxy(dx,dy)
+            out.append(pad_smd(str(k+17), 9.5, -10.4 + k*1.27, 1.5, 0.9, net))
+    for k in range(9):   # 33..41 bottom row
         net = pin_nets.get(k+33, "")
         if net:
-            out.append(pad_smd(str(k+33), x+rdx, y+rdy, 0.9, 1.5, net))
+            out.append(pad_smd(str(k+33), -8.0 + k*2.0, 11.5, 0.9, 1.5, net))
     out.extend(fp_close()); emit("\n".join(out))
 
 def place_usb_c(ref, value, x, y, rot, nets):
-    """USB-C HRO TYPE-C-31-M-12 (USB 2.0 16-pin variant).
-    nets: dict {GND, VBUS, CC1, CC2, Dp, Dn, SBU1, SBU2, SHIELD}."""
+    """USB-C HRO TYPE-C-31-M-12; LOCAL pad coords."""
     out = fp_open("Connector:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
                   ref, value, x, y, rot, attrs="smd")
-    # 12-pin SMD pad row + 4 TH mounting tabs (shield). Pin pitch 0.5 mm.
-    def rotxy(dx,dy):
-        if rot == 90: return -dy,dx
-        if rot == 180: return -dx,-dy
-        if rot == 270: return dy,-dx
-        return dx,dy
-    # SMD signal pads on bottom edge (front of connector). 12 pads + 4 shield tabs.
-    pin_map = [  # (pin_number, x_offset, net_name)
+    pin_map = [
         (1, -2.75, "GND"),
         (2, -2.25, "VBUS"),
-        (3, -1.75, "SBU2"),  # SBU not used → leave as plain SBU net? skip
         (4, -1.25, "CC1"),
         (5, -0.75, "USB_D+"),
         (6, -0.25, "USB_D-"),
-        (7,  0.25, "USB_D+"),  # secondary D+ (USB-C parallel)
+        (7,  0.25, "USB_D+"),
         (8,  0.75, "USB_D-"),
         (9,  1.25, "CC2"),
-        (10, 1.75, "SBU1"),
         (11, 2.25, "VBUS"),
         (12, 2.75, "GND"),
     ]
     for (pn, dx, net) in pin_map:
-        if net == "SBU1" or net == "SBU2":
-            continue  # leave unconnected
-        rdx, rdy = rotxy(dx, -3.5)
-        out.append(pad_smd(str(pn), x+rdx, y+rdy, 0.3, 1.4, net))
-    # Shell / shield mounting tabs (4) -> GND
+        out.append(pad_smd(str(pn), dx, -3.5, 0.3, 1.4, net))
+    # Shield/mounting tabs
     for tabx in (-4.32, 4.32):
         for taby in (-2.5, 2.5):
-            rdx, rdy = rotxy(tabx, taby)
-            out.append(pad_th("SH", x+rdx, y+rdy, 1.6, 0.65, "GND",
+            out.append(pad_th("SH", tabx, taby, 1.6, 0.65, "GND",
                               oval=True, w=1.0, h=2.4))
     out.extend(fp_close()); emit("\n".join(out))
 
 def place_screw_term_8(ref, value, x, y, rot, out_nets):
-    """Phoenix MKDS-1,5-8 P5.00, 8 through-hole pins (horizontal).
-    out_nets: list of 8 net names assigned to pin 1..8 (left-to-right)."""
+    """Phoenix MKDS-1,5-8 P5.00 — LOCAL pad coords."""
     out = fp_open("TerminalBlock:TerminalBlock_Phoenix_MKDS-1,5-8_1x08_P5.00mm_Horizontal",
                   ref, value, x, y, rot, attrs="through_hole")
-    def rotxy(dx,dy):
-        if rot == 90: return -dy,dx
-        if rot == 180: return -dx,-dy
-        if rot == 270: return dy,-dx
-        return dx,dy
     P = 5.0
     for k in range(8):
-        dx, dy = -P*3.5 + k*P, 0
-        rdx, rdy = rotxy(dx, dy)
-        net = out_nets[k]
-        out.append(pad_th(str(k+1), x+rdx, y+rdy, 2.5, 1.3, net))
+        out.append(pad_th(str(k+1), -P*3.5 + k*P, 0, 2.5, 1.3, out_nets[k]))
     out.extend(fp_close()); emit("\n".join(out))
 
 def place_mh(ref, x, y):
     out = fp_open("MountingHole:MountingHole_3.2mm_M3", ref, "M3", x, y, 0,
                   attrs="through_hole exclude_from_pos_files exclude_from_bom")
-    out.append(pad_np(0, 0, MH_DRILL))  # local-frame inside footprint
-    # Re-emit pad in component frame:
-    out[-1] = (f'    (pad "" np_thru_hole circle (at 0 0) (size {MH_DRILL} {MH_DRILL})'
+    out.append(f'    (pad "" np_thru_hole circle (at 0 0) (size {MH_DRILL} {MH_DRILL})'
                f' (drill {MH_DRILL}) (layers "F&B.Cu" "*.Mask") (uuid "{u()}"))')
     out.extend(fp_close()); emit("\n".join(out))
 
@@ -678,7 +554,9 @@ RECT = [(Z,Z),(W-Z,Z),(W-Z,H-Z),(Z,H-Z)]
 zone("GND",  "GND",  "In1.Cu", RECT)
 zone("+24V", "+24V", "In2.Cu", RECT)
 zone("GND",  "GND",  "B.Cu",   RECT)
-# A 3V3 pour on F.Cu top-left to feed ESP32 region (small island)
+# F.Cu GND pour (priority 0) covers free copper on top; +3V3 island
+# (priority 10) takes precedence over it in the ESP32 region.
+zone("GND",  "GND",  "F.Cu",   RECT, priority=0)
 zone("+3V3", "+3V3", "F.Cu", [(5,15),(95,15),(95,85),(5,85)], priority=10)
 
 # ====================================================================
