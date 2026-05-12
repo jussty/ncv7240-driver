@@ -39,6 +39,7 @@ def eff(size=1.27, justify=None, hide=False):
 def sym(name, ref, value, pins, w, h, power=False, fp=""):
     """Emit a (symbol ...) library entry."""
     out = []
+    short = name.split(":", 1)[-1]
     out.append(f'(symbol "{name}"')
     out.append('  (pin_names (offset 0.508))')
     out.append('  (exclude_from_sim no) (in_bom yes) (on_board yes)')
@@ -48,14 +49,14 @@ def sym(name, ref, value, pins, w, h, power=False, fp=""):
     out.append(f'  (property "Value" "{value}" (at 0 {-h/2-2.54:.2f} 0) {eff()})')
     out.append(f'  (property "Footprint" "{fp}" (at 0 0 0) {eff(hide=True)})')
     out.append(f'  (property "Datasheet" "" (at 0 0 0) {eff(hide=True)})')
-    out.append(f'  (symbol "{name}_0_1"')
+    out.append(f'  (symbol "{short}_0_1"')
     if not power:
         out.append(f'    (rectangle (start {-w/2:.2f} {h/2:.2f}) (end {w/2:.2f} {-h/2:.2f})')
         out.append('      (stroke (width 0.254) (type default))')
         out.append('      (fill (type background))')
         out.append('    )')
     out.append('  )')
-    out.append(f'  (symbol "{name}_1_1"')
+    out.append(f'  (symbol "{short}_1_1"')
     for (num, pname, side, yoff, etype) in pins:
         if side == 'L':
             x, y, rot = -w/2 - 2.54, yoff, 0
@@ -75,18 +76,19 @@ def sym(name, ref, value, pins, w, h, power=False, fp=""):
 
 # ---- Power symbols (special: invisible body, single pin pointing up) -------
 def pwr_sym(name, label):
+    short = name.split(":", 1)[-1]
     return f'''(symbol "{name}"
   (power) (pin_names (offset 0)) (in_bom yes) (on_board yes)
   (property "Reference" "#PWR" (at 0 -3.81 0) {eff(hide=True)})
   (property "Value" "{label}" (at 0 3.556 0) {eff()})
   (property "Footprint" "" (at 0 0 0) {eff(hide=True)})
   (property "Datasheet" "" (at 0 0 0) {eff(hide=True)})
-  (symbol "{name}_0_1"
+  (symbol "{short}_0_1"
     (polyline (pts (xy -1.016 -0.508) (xy 0 0.762) (xy 1.016 -0.508) (xy -1.016 -0.508))
       (stroke (width 0) (type default)) (fill (type none))
     )
   )
-  (symbol "{name}_1_1"
+  (symbol "{short}_1_1"
     (pin power_in line (at 0 0 90) (length 0)
       (name "{label}" {eff(hide=True)})
       (number "1" {eff(hide=True)})

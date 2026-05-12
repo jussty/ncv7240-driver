@@ -15,12 +15,12 @@
       (property "Value" "+24V" (at 0 3.556 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "power:+24V_0_1"
+      (symbol "+24V_0_1"
         (polyline (pts (xy -1.016 -0.508) (xy 0 0.762) (xy 1.016 -0.508) (xy -1.016 -0.508))
           (stroke (width 0) (type default)) (fill (type none))
         )
       )
-      (symbol "power:+24V_1_1"
+      (symbol "+24V_1_1"
         (pin power_in line (at 0 0 90) (length 0)
           (name "+24V" (effects (font (size 1.27 1.27)) hide))
           (number "1" (effects (font (size 1.27 1.27)) hide))
@@ -33,12 +33,12 @@
       (property "Value" "+3V3" (at 0 3.556 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "power:+3V3_0_1"
+      (symbol "+3V3_0_1"
         (polyline (pts (xy -1.016 -0.508) (xy 0 0.762) (xy 1.016 -0.508) (xy -1.016 -0.508))
           (stroke (width 0) (type default)) (fill (type none))
         )
       )
-      (symbol "power:+3V3_1_1"
+      (symbol "+3V3_1_1"
         (pin power_in line (at 0 0 90) (length 0)
           (name "+3V3" (effects (font (size 1.27 1.27)) hide))
           (number "1" (effects (font (size 1.27 1.27)) hide))
@@ -51,12 +51,12 @@
       (property "Value" "VBUS" (at 0 3.556 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "power:VBUS_0_1"
+      (symbol "VBUS_0_1"
         (polyline (pts (xy -1.016 -0.508) (xy 0 0.762) (xy 1.016 -0.508) (xy -1.016 -0.508))
           (stroke (width 0) (type default)) (fill (type none))
         )
       )
-      (symbol "power:VBUS_1_1"
+      (symbol "VBUS_1_1"
         (pin power_in line (at 0 0 90) (length 0)
           (name "VBUS" (effects (font (size 1.27 1.27)) hide))
           (number "1" (effects (font (size 1.27 1.27)) hide))
@@ -69,12 +69,12 @@
       (property "Value" "GND" (at 0 3.556 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "power:GND_0_1"
+      (symbol "GND_0_1"
         (polyline (pts (xy -1.016 -0.508) (xy 0 0.762) (xy 1.016 -0.508) (xy -1.016 -0.508))
           (stroke (width 0) (type default)) (fill (type none))
         )
       )
-      (symbol "power:GND_1_1"
+      (symbol "GND_1_1"
         (pin power_in line (at 0 0 90) (length 0)
           (name "GND" (effects (font (size 1.27 1.27)) hide))
           (number "1" (effects (font (size 1.27 1.27)) hide))
@@ -166,13 +166,13 @@
       (property "Value" "USB_C_Receptacle" (at 0 -19.05 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "Connector:USB_C_Receptacle_HRO_TYPE-C-31-M-12" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "Connector:USB_C_0_1"
+      (symbol "USB_C_0_1"
         (rectangle (start -11.43 16.51) (end 11.43 -16.51)
           (stroke (width 0.254) (type default))
           (fill (type background))
         )
       )
-      (symbol "Connector:USB_C_1_1"
+      (symbol "USB_C_1_1"
         (pin power_in line (at -13.97 12.70 0) (length 2.54)
           (name "GND" (effects (font (size 1.27 1.27))))
           (number "A1" (effects (font (size 1.27 1.27))))
@@ -226,13 +226,13 @@
       (property "Value" "AP33772S" (at 0 -16.51 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "PMIC:AP33772S_0_1"
+      (symbol "AP33772S_0_1"
         (rectangle (start -12.70 13.97) (end 12.70 -13.97)
           (stroke (width 0.254) (type default))
           (fill (type background))
         )
       )
-      (symbol "PMIC:AP33772S_1_1"
+      (symbol "AP33772S_1_1"
         (pin power_in line (at -15.24 10.16 0) (length 2.54)
           (name "VBUS" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
@@ -294,13 +294,13 @@
       (property "Value" "ESP32-S3-WROOM-1-N8R8" (at 0 -26.67 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "RF_Module:ESP32-S3-WROOM-1" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "RF_Module:ESP32-S3-WROOM-1_0_1"
+      (symbol "ESP32-S3-WROOM-1_0_1"
         (rectangle (start -16.51 24.13) (end 16.51 -24.13)
           (stroke (width 0.254) (type default))
           (fill (type background))
         )
       )
-      (symbol "RF_Module:ESP32-S3-WROOM-1_1_1"
+      (symbol "ESP32-S3-WROOM-1_1_1"
         (pin power_in line (at -19.05 20.32 0) (length 2.54)
           (name "3V3" (effects (font (size 1.27 1.27))))
           (number "2" (effects (font (size 1.27 1.27))))
@@ -386,13 +386,13 @@
       (property "Value" "NCV7240" (at 0 -16.51 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "Package_SO:SSOP-24_5.3x8.2mm_P0.65mm" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "Driver_Motor:NCV7240_0_1"
+      (symbol "NCV7240_0_1"
         (rectangle (start -13.97 13.97) (end 13.97 -13.97)
           (stroke (width 0.254) (type default))
           (fill (type background))
         )
       )
-      (symbol "Driver_Motor:NCV7240_1_1"
+      (symbol "NCV7240_1_1"
         (pin power_in line (at -16.51 10.16 0) (length 2.54)
           (name "VPWR" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
@@ -470,13 +470,13 @@
       (property "Value" "MP2451 / TPS62932" (at 0 -10.16 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "Package_TO_SOT_SMD:SOT-23-6" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "Regulator_Switching:BUCK_24_3V3_0_1"
+      (symbol "BUCK_24_3V3_0_1"
         (rectangle (start -11.43 7.62) (end 11.43 -7.62)
           (stroke (width 0.254) (type default))
           (fill (type background))
         )
       )
-      (symbol "Regulator_Switching:BUCK_24_3V3_1_1"
+      (symbol "BUCK_24_3V3_1_1"
         (pin power_in line (at -13.97 5.08 0) (length 2.54)
           (name "VIN" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
@@ -510,13 +510,13 @@
       (property "Value" "Screw_Terminal_8" (at 0 -13.97 0) (effects (font (size 1.27 1.27))))
       (property "Footprint" "TerminalBlock:TerminalBlock_Phoenix_MKDS-1,5-8_1x08_P5.00mm_Horizontal" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
       (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "Connector:Screw_Term_8_0_1"
+      (symbol "Screw_Term_8_0_1"
         (rectangle (start -6.35 11.43) (end 6.35 -11.43)
           (stroke (width 0.254) (type default))
           (fill (type background))
         )
       )
-      (symbol "Connector:Screw_Term_8_1_1"
+      (symbol "Screw_Term_8_1_1"
         (pin passive line (at -8.89 8.89 0) (length 2.54)
           (name "1" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
