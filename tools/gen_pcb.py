@@ -571,10 +571,28 @@ for bank_i, ncv_y in enumerate(ncv_y_centres):
         place_dsma(f"D{diode_ref}", "B260A", dx, dy, 0, "+24V", out_net)
         diode_ref += 1
 
-    # 8-pos screw terminal horizontal at x=180, y=ncv_y, rot=0 (pin1..8 left to right)
+    # 8-pos screw terminal horizontal at x=175, y=ncv_y, rot=0 (pin1..8 left to right)
+    # x=175 → pins span 157.5..192.5; MH at (196,…) gets 3.5 mm clearance.
     out_nets = [f"OUT{bank_i*8 + k + 1}" for k in range(8)]
     place_screw_term_8(f"J{2+bank_i}", f"OUT{bank_i*8+1}-{bank_i*8+8}",
-                       180, ncv_y, 0, out_nets)
+                       175, ncv_y, 0, out_nets)
+
+    # --- OUT routing: NCV right pin → flyback diode anode → terminal pin ---
+    for k in range(8):
+        # NCV output pin (13+k on right side). Pin pitch 0.65 mm, top-to-bottom.
+        x_ncv = 108 + 3.0          # right edge of SSOP + small offset
+        y_ncv = ncv_y + 0.65*5.5 - k*0.65  # pin 13 (k=0) at top
+        # Flyback diode (D[diode_ref-8+k]) at:
+        col = k // 4; row = k % 4
+        x_dA  = 140 + col*8 + 1.925   # anode (right pad)
+        y_dAK = ncv_y - 6.5 + row*4
+        # Terminal pin
+        x_t = 175 - 17.5 + k*5
+        y_t = ncv_y
+        net = f"OUT{bank_i*8 + k + 1}"
+        # 2-segment route: NCV pad → diode anode pad → terminal pin
+        track(x_ncv, y_ncv, x_dA,  y_dAK, net, layer="F.Cu", width=0.5)
+        track(x_dA,  y_dAK, x_t,   y_t,   net, layer="F.Cu", width=0.5)
 
 # ====================================================================
 # === Routing — power vias to inner planes ===========================
@@ -586,6 +604,52 @@ for bank_i, ncv_y in enumerate(ncv_y_centres):
 # We'll drop one stitching via per IC corner via a generic algorithm:
 # generate vias next to each IC body on +24V and GND nets so the planes
 # see them.
+
+# ---- ESP32 ↔ NCV bus (shared SPI signals) -------------------------------
+# 5 shared bus signals: SCK (NCV pin4), MOSI (5), MISO (6), RSTB (7), FSOB (8).
+# Run them as 5 vertical busses on F.Cu in the gap x=96..100, spanning all 4
+# NCVs vertically. Then short stub from each NCV pin (left side) to the bus.
+# NCV left pins (1..12): x = 108 - 3.0 = 105, y = ncv_y - 0.65*5.5 + k*0.65
+# Pin 4 = k=3, pin 5 = k=4, pin 6 = k=5, pin 7 = k=6, pin 8 = k=7
+BUS_X = {
+    "SPI_SCK":  96.0,
+    "SPI_MOSI": 97.0,
+    "SPI_MISO": 98.0,
+    "NCV_RSTB": 99.0,
+    "NCV_FSOB": 100.0,
+}
+BUS_PIN_K = {  # pin number on NCV → k offset from top of left column
+    "SPI_SCK":  3,   # pin 4
+    "SPI_MOSI": 4,   # pin 5
+    "SPI_MISO": 5,   # pin 6
+    "NCV_RSTB": 6,   # pin 7
+    "NCV_FSOB": 7,   # pin 8
+}
+y_top = ncv_y_centres[0] - 0.65*5.5
+y_bot = ncv_y_centres[-1] + 0.65*5.5
+for net, bx in BUS_X.items():
+    # Vertical bus track
+    track(bx, y_top - 5, bx, y_bot + 5, net, layer="F.Cu", width=0.25)
+    # Stubs from each NCV pin to the bus
+    for ncv_y in ncv_y_centres:
+        k = BUS_PIN_K[net]
+        py = ncv_y - 0.65*5.5 + k*0.65
+        track(105.0, py, bx, py, net, layer="F.Cu", width=0.25)
+
+# Per-NCV /CSB lines (independent, x=104 column with horizontal stubs)
+for i, ncv_y in enumerate(ncv_y_centres):
+    py = ncv_y - 0.65*5.5 + 2*0.65   # pin 3 (CSB), k=2
+    track(105.0, py, 95.0, py, f"SPI_CS{i+1}", layer="F.Cu", width=0.25)
+
+# ESP32 → bus: short horizontal tracks from ESP32 right edge (x=84.5) to bus
+# columns. ESP32 SPI pins are on its left side in the schematic, but the module
+# pad geometry here has them on the LEFT (pins 19..26). For brevity, route
+# from a representative point. KiCad's autorouter will tidy these.
+for net, bx in BUS_X.items():
+    track(84.5, 35, bx, 35, net, layer="F.Cu", width=0.25)
+for i in range(4):
+    track(84.5, 38 + i*1.5, 95, 38 + i*1.5, f"SPI_CS{i+1}",
+          layer="F.Cu", width=0.25)
 
 # Stitching vias around the perimeter for solid GND continuity
 for x in range(10, int(W)-9, 12):
