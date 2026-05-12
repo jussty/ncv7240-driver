@@ -158,20 +158,23 @@ LIB.append('''(symbol "Device:L"
   )
 )''')
 
-# Diode (TVS / generic)
-LIB.append('''(symbol "Device:D_TVS"
+# Diode (TVS / generic) — pin1=K (left), pin2=A (right)
+for _nm in ("Device:D_TVS", "Device:D"):
+    _shape_extra = '(polyline (pts (xy -1.27 1.27) (xy -1.27 -1.27)) (stroke (width 0.254) (type default)) (fill (type none)))' if _nm == "Device:D" else \
+                   '(polyline (pts (xy 1.27 1.27) (xy 1.27 -1.27)) (stroke (width 0.254) (type default)) (fill (type none)))'
+    LIB.append(f'''(symbol "{_nm}"
   (pin_names (offset 0.254) hide) (exclude_from_sim no) (in_bom yes) (on_board yes)
-  (property "Reference" "D" (at 0 2.54 0) ''' + eff() + ''')
-  (property "Value" "D_TVS" (at 0 -2.54 0) ''' + eff() + ''')
-  (property "Footprint" "" (at 0 0 0) ''' + eff(hide=True) + ''')
-  (property "Datasheet" "" (at 0 0 0) ''' + eff(hide=True) + ''')
-  (symbol "D_TVS_0_1"
+  (property "Reference" "D" (at 0 2.54 0) {eff()})
+  (property "Value" "{_nm.split(":")[1]}" (at 0 -2.54 0) {eff()})
+  (property "Footprint" "" (at 0 0 0) {eff(hide=True)})
+  (property "Datasheet" "" (at 0 0 0) {eff(hide=True)})
+  (symbol "{_nm.split(":")[1]}_0_1"
     (polyline (pts (xy -1.27 1.27) (xy 1.27 0) (xy -1.27 -1.27) (xy -1.27 1.27)) (stroke (width 0.254) (type default)) (fill (type none)))
-    (polyline (pts (xy 1.27 1.27) (xy 1.27 -1.27)) (stroke (width 0.254) (type default)) (fill (type none)))
+    {_shape_extra}
   )
-  (symbol "D_TVS_1_1"
-    (pin passive line (at -3.81 0 0)   (length 2.54) (name "K" ''' + eff() + ''') (number "1" ''' + eff() + '''))
-    (pin passive line (at  3.81 0 180) (length 2.54) (name "A" ''' + eff() + ''') (number "2" ''' + eff() + '''))
+  (symbol "{_nm.split(":")[1]}_1_1"
+    (pin passive line (at -3.81 0 0)   (length 2.54) (name "K" {eff()}) (number "1" {eff()}))
+    (pin passive line (at  3.81 0 180) (length 2.54) (name "A" {eff()}) (number "2" {eff()}))
   )
 )''')
 
@@ -245,7 +248,7 @@ LIB.append(sym(
         ("14", "IO20/USB_D+", 'R', 10.16, "bidirectional"),
         ("1",  "GND",       'R',   2.54, "power_in"),
     ],
-    w=33.02, h=48.26, fp="RF_Module:ESP32-S2-WROOM"
+    w=33.02, h=48.26, fp="RF_Module:ESP32-S3-WROOM-1"
 ))
 
 # NCV7240 — octal low-side driver, SPI
@@ -378,16 +381,19 @@ gl("I2C_SDA",    U1_X + 25.4/2 + 2.54 + 5.08, U1_Y - 5.08, rot=0, shape="bidirec
 gl("I2C_SCL",    U1_X + 25.4/2 + 2.54 + 5.08, U1_Y - 2.54, rot=0, shape="input")
 gl("PD_INT",     U1_X + 25.4/2 + 2.54 + 5.08, U1_Y - 0,    rot=0, shape="output")
 
-# Bulk caps on VBUS_24V
-place("Device:C", "C1", "100uF/50V", U1_X + 25.4/2 + 17.78, U1_Y - 5.08, rot=0)
-place("Device:C", "C2", "10uF/50V",  U1_X + 25.4/2 + 25.4,  U1_Y - 5.08, rot=0)
+# Bulk caps on VBUS_24V (aluminium polymer SMD)
+place("Device:C", "C1", "100uF/50V", U1_X + 25.4/2 + 17.78, U1_Y - 5.08, rot=0,
+      fp="Capacitor_SMD:CP_Elec_10x10.5")
+place("Device:C", "C2", "10uF/50V",  U1_X + 25.4/2 + 25.4,  U1_Y - 5.08, rot=0,
+      fp="Capacitor_SMD:C_1210_3225Metric")
 pwr("power:+24V", U1_X + 25.4/2 + 17.78, U1_Y - 5.08 - 3.81)
 pwr("power:+24V", U1_X + 25.4/2 + 25.4,  U1_Y - 5.08 - 3.81)
 pwr("power:GND",  U1_X + 25.4/2 + 17.78, U1_Y - 5.08 + 3.81, rot=180)
 pwr("power:GND",  U1_X + 25.4/2 + 25.4,  U1_Y - 5.08 + 3.81, rot=180)
 
 # TVS on VBUS
-place("Device:D_TVS", "D1", "SMBJ33A", U1_X + 25.4/2 + 33.02, U1_Y - 5.08, rot=90)
+place("Device:D_TVS", "D1", "SMBJ33A", U1_X + 25.4/2 + 33.02, U1_Y - 5.08, rot=90,
+      fp="Diode_SMD:D_SMB")
 
 # AP33772S decoupling note
 note("AP33772S: 1uF on VDD, 100nF on VPP\\n(place close to IC pins, not shown here)",
@@ -402,21 +408,25 @@ pwr("power:GND",  U7_X - 22.86/2 - 2.54 - 5.08, U7_Y + 0,    rot=180)
 gl("EN_3V3", U7_X - 22.86/2 - 2.54 - 5.08, U7_Y + 2.54, rot=180, shape="input")
 
 # Inductor on SW node
-place("Device:L", "L1", "4.7uH", U7_X + 22.86/2 + 7.62, U7_Y + 5.08, rot=90)
+place("Device:L", "L1", "4.7uH/2A", U7_X + 22.86/2 + 7.62, U7_Y + 5.08, rot=90,
+      fp="Inductor_SMD:L_Bourns-SRN6045TA")
 # Output cap
-place("Device:C", "C3", "10uF",  U7_X + 22.86/2 + 17.78, U7_Y + 5.08, rot=0)
+place("Device:C", "C3", "22uF",  U7_X + 22.86/2 + 17.78, U7_Y + 5.08, rot=0,
+      fp="Capacitor_SMD:C_0805_2012Metric")
 pwr("power:+3V3", U7_X + 22.86/2 + 17.78, U7_Y + 5.08 - 3.81)
 pwr("power:GND",  U7_X + 22.86/2 + 17.78, U7_Y + 5.08 + 3.81, rot=180)
 # Feedback resistors
-place("Device:R", "R6", "100k",  U7_X + 22.86/2 + 5.08,  U7_Y - 7.62, rot=0)
-place("Device:R", "R7", "20k",   U7_X + 22.86/2 + 5.08,  U7_Y - 15.24, rot=0)
+place("Device:R", "R6", "100k",  U7_X + 22.86/2 + 5.08,  U7_Y - 7.62, rot=0,
+      fp="Resistor_SMD:R_0603_1608Metric")
+place("Device:R", "R7", "20k",   U7_X + 22.86/2 + 5.08,  U7_Y - 15.24, rot=0,
+      fp="Resistor_SMD:R_0603_1608Metric")
 note("Buck 24V→3.3V, ≥500mA\\nVOUT = 0.6V·(1+R6/R7)",
      U7_X - 12, U7_Y + 15, size=1.27)
 
 # ---------------- ESP32-S3 ----------------
 U2_X, U2_Y = 290, 130
 place("RF_Module:ESP32-S3-WROOM-1", "U2", "ESP32-S3-WROOM-1-N8R8", U2_X, U2_Y,
-      fp="RF_Module:ESP32-S2-WROOM")
+      fp="RF_Module:ESP32-S3-WROOM-1")
 
 # Left-side rails
 pwr("power:+3V3", U2_X - 33.02/2 - 2.54 - 5.08, U2_Y + 20.32)
@@ -451,22 +461,25 @@ pwr("power:GND",  U2_X + 33.02/2 + 2.54 + 5.08, U2_Y + 2.54, rot=180)
 
 # Pull-ups (right of ESP32)
 PU_X = U2_X + 50
-place("Device:R", "R1", "10k",  PU_X,        U2_Y + 22, rot=0); pwr("power:+3V3", PU_X, U2_Y + 22 - 3.81)
+FP_R0603 = "Resistor_SMD:R_0603_1608Metric"
+place("Device:R", "R1", "10k",  PU_X,        U2_Y + 22, rot=0, fp=FP_R0603); pwr("power:+3V3", PU_X, U2_Y + 22 - 3.81)
 gl("SPI_MISO", PU_X, U2_Y + 22 + 3.81, rot=270, shape="bidirectional")
-place("Device:R", "R2", "10k",  PU_X + 7.62, U2_Y + 22, rot=0); pwr("power:+3V3", PU_X + 7.62, U2_Y + 22 - 3.81)
+place("Device:R", "R2", "10k",  PU_X + 7.62, U2_Y + 22, rot=0, fp=FP_R0603); pwr("power:+3V3", PU_X + 7.62, U2_Y + 22 - 3.81)
 gl("NCV_RSTB", PU_X + 7.62, U2_Y + 22 + 3.81, rot=270, shape="bidirectional")
-place("Device:R", "R3", "10k",  PU_X + 15.24,U2_Y + 22, rot=0); pwr("power:+3V3", PU_X + 15.24, U2_Y + 22 - 3.81)
+place("Device:R", "R3", "10k",  PU_X + 15.24,U2_Y + 22, rot=0, fp=FP_R0603); pwr("power:+3V3", PU_X + 15.24, U2_Y + 22 - 3.81)
 gl("NCV_FSOB", PU_X + 15.24, U2_Y + 22 + 3.81, rot=270, shape="bidirectional")
-place("Device:R", "R4", "4.7k", PU_X + 22.86,U2_Y + 22, rot=0); pwr("power:+3V3", PU_X + 22.86, U2_Y + 22 - 3.81)
+place("Device:R", "R4", "4.7k", PU_X + 22.86,U2_Y + 22, rot=0, fp=FP_R0603); pwr("power:+3V3", PU_X + 22.86, U2_Y + 22 - 3.81)
 gl("I2C_SDA",  PU_X + 22.86, U2_Y + 22 + 3.81, rot=270, shape="bidirectional")
-place("Device:R", "R5", "4.7k", PU_X + 30.48,U2_Y + 22, rot=0); pwr("power:+3V3", PU_X + 30.48, U2_Y + 22 - 3.81)
+place("Device:R", "R5", "4.7k", PU_X + 30.48,U2_Y + 22, rot=0, fp=FP_R0603); pwr("power:+3V3", PU_X + 30.48, U2_Y + 22 - 3.81)
 gl("I2C_SCL",  PU_X + 30.48, U2_Y + 22 + 3.81, rot=270, shape="bidirectional")
 
 # 3V3 decoupling
-place("Device:C", "C4", "10uF",  U2_X - 33.02/2 - 12.7, U2_Y + 25.4, rot=0)
+FP_C0603 = "Capacitor_SMD:C_0603_1608Metric"
+FP_C0805 = "Capacitor_SMD:C_0805_2012Metric"
+place("Device:C", "C4", "10uF",  U2_X - 33.02/2 - 12.7, U2_Y + 25.4, rot=0, fp=FP_C0805)
 pwr("power:+3V3", U2_X - 33.02/2 - 12.7, U2_Y + 25.4 - 3.81)
 pwr("power:GND",  U2_X - 33.02/2 - 12.7, U2_Y + 25.4 + 3.81, rot=180)
-place("Device:C", "C5", "100nF", U2_X - 33.02/2 - 5.08, U2_Y + 25.4, rot=0)
+place("Device:C", "C5", "100nF", U2_X - 33.02/2 - 5.08, U2_Y + 25.4, rot=0, fp=FP_C0603)
 pwr("power:+3V3", U2_X - 33.02/2 - 5.08, U2_Y + 25.4 - 3.81)
 pwr("power:GND",  U2_X - 33.02/2 - 5.08, U2_Y + 25.4 + 3.81, rot=180)
 
@@ -492,11 +505,12 @@ for i, (ref, ch_start) in enumerate([("U3",1),("U4",9),("U5",17),("U6",25)]):
     gl("NCV_FSOB",     NX - 27.94/2 - 2.54 - 5.08, NY - 7.62,  rot=180, shape="bidirectional")
     # Local decoupling caps (one shown per IC, representative)
     place("Device:C", f"C{10+i*2}", "100nF",
-          NX - 27.94/2 - 17.78, NY + 10.16, rot=0)
+          NX - 27.94/2 - 17.78, NY + 10.16, rot=0, fp=FP_C0603)
     pwr("power:+24V", NX - 27.94/2 - 17.78, NY + 10.16 - 3.81)
     pwr("power:GND",  NX - 27.94/2 - 17.78, NY + 10.16 + 3.81, rot=180)
     place("Device:C", f"C{11+i*2}", "10uF/50V",
-          NX - 27.94/2 - 25.4, NY + 10.16, rot=0)
+          NX - 27.94/2 - 25.4, NY + 10.16, rot=0,
+          fp="Capacitor_SMD:C_1210_3225Metric")
     pwr("power:+24V", NX - 27.94/2 - 25.4, NY + 10.16 - 3.81)
     pwr("power:GND",  NX - 27.94/2 - 25.4, NY + 10.16 + 3.81, rot=180)
     # Output header
@@ -512,6 +526,28 @@ for i, (ref, ch_start) in enumerate([("U3",1),("U4",9),("U5",17),("U6",25)]):
         # Place global label between IC right side and header left side
         gl(f"OUT{ch}", NX + 27.94/2 + 2.54 + 5.08, ncv_y, rot=0,  shape="output")
         gl(f"OUT{ch}", JX - 12.7/2  - 2.54 - 5.08, hdr_y, rot=180, shape="input")
+
+# ---------------- Freewheel diode array (32x B260A) ----------------
+# Bürkert 0127 valves are inductive (≈3 W @ 24 V ⇒ ~125 mA, several tens of mH).
+# Each output gets a B260A Schottky (60 V / 2 A) clamping OUTx → +24V rail.
+# Anode → OUTx, Cathode → +24V. Placed in a 4×8 grid below the main section.
+FW_X0, FW_Y0 = 60, 340           # top-left of array
+FW_DX, FW_DY = 16.0, 10.16       # column / row pitch
+note("Freewheel diodes for inductive loads (Bürkert Type 0127 valves)\\n"
+     "B260A-13-F  60V / 2A  SMA  —  K→+24V, A→OUTx", FW_X0, FW_Y0 - 8, size=1.5)
+fb_idx = 1
+for i in range(4):                       # one row per NCV7240
+    for k in range(8):                   # 8 channels per IC
+        ch = i*8 + k + 1
+        dx = FW_X0 + k*FW_DX
+        dy = FW_Y0 + i*FW_DY
+        place("Device:D", f"D{1+fb_idx}", "B260A-13-F", dx, dy, rot=0,
+              fp="Diode_SMD:D_SMA")
+        # Cathode (pin1) at left = +24V
+        pwr("power:+24V", dx - 3.81 - 2.54, dy, rot=270)
+        # Anode (pin2) at right = OUTx
+        gl(f"OUT{ch}", dx + 3.81 + 2.54, dy, rot=0, shape="input")
+        fb_idx += 1
 
 # Section labels (large text)
 note("USB-C PD 3.1 EPR sink — 24V/3A negotiated", 30, 40, size=2.0)
